@@ -14,6 +14,8 @@ repositories {
 }
 
 dependencies {
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: SPRING_BOOT_VERSION
+
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
 

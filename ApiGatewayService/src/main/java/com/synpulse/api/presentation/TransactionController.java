@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/transaction/v1")
 public class TransactionController {
 
-    @GetMapping("/transaction/{id}")
+    @GetMapping("/{id}")
     public String getMoneyTransaction(@PathVariable Long id) {
 
         //do something

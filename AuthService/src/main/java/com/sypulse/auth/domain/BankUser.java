@@ -19,8 +19,8 @@ public class BankUser {
 
     @Id
     @Column(name = "ID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private String id;
 
     @Column(name = "ACCOUNT")
     private String account;

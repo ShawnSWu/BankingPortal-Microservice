@@ -1,9 +1,9 @@
 package com.sypulse.auth.usecase;
 
+import com.sypulse.auth.domain.BankUser;
 import com.sypulse.auth.domain.JwtTokenService;
 import com.sypulse.auth.domain.UserService;
 import com.sypulse.auth.persentation.dto.LoginRequest;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,7 +18,7 @@ public class UserUseCase {
     }
 
     public String login(LoginRequest loginRequest) {
-        UserDetails userDetails = userService.login(loginRequest.getAccount(), loginRequest.getPassword());
+        BankUser userDetails = userService.login(loginRequest.getAccount(), loginRequest.getPassword());
         return jwtTokenService.generateToken(userDetails);
     }
 

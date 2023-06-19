@@ -5,5 +5,5 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface UserService {
 
-    UserDetails login(String account, String password) throws UsernameNotFoundException;
+    BankUser login(String account, String password) throws UsernameNotFoundException;
 }

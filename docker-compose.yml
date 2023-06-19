@@ -54,15 +54,15 @@ services:
 #    networks:
 #      - local
 #
-#  exchangerate:
-#    build: ./ExchangeRateService
-#    container_name: ExchangeRateService
-#    ports:
-#      - 8083:8083
-#    depends_on:
-#      - kafka
-#    networks:
-#      - local
+  exchangerate:
+    build: ./ExchangeRateService
+    container_name: ExchangeRateService
+    ports:
+      - 8083:8083
+    depends_on:
+      - kafka
+    networks:
+      - local
 
 networks:
 

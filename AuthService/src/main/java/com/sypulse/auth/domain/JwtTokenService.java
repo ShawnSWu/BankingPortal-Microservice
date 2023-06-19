@@ -19,11 +19,11 @@ public class JwtTokenService {
     @Value("${app.jwt.secret}")
     private String secret;
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(BankUser userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(userDetails.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
                 .signWith(SignatureAlgorithm.HS512, secret)
