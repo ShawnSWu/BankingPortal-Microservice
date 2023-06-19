@@ -5,6 +5,10 @@ plugins {
 group 'org.synpulse'
 version '1.0-SNAPSHOT'
 
+bootJar {
+    archiveFileName="ExchangeRateService.jar"
+}
+
 repositories {
     mavenCentral()
 }

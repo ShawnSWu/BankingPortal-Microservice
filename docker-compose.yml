@@ -1,30 +1,69 @@
 version: "3"
 
 services:
-  user:
-    build: ./ApiGatewayService .
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
     ports:
-      - "8080:8080"
+      - 2181:2181
     networks:
       - local
-  trip:
-    build: ./AuthService .
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
     ports:
-      - "8081:8081"
+      - 9092:9092
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "query_transaction_v1"
+    depends_on:
+      - zookeeper
     networks:
       - local
-  pricing:
-    build: ./TransactionManagementService .
+
+  api:
+    build: ./ApiGatewayService
+    container_name: ApiGatewayService
     ports:
-      - "8082:8082"
+      - 8080:8080
+    depends_on:
+      - kafka
     networks:
       - local
-  match:
-    build: ./ExchangeRateService .
+
+  auth:
+    build: ./AuthService
+    container_name: AuthService
     ports:
-      - "8083:8083"
+      - 8081:8081
+    depends_on:
+      - kafka
     networks:
       - local
+
+#  transaction:
+#    build: ./TransactionManagementService
+#    container_name: TransactionManagementService
+#    ports:
+#      - 8082:8082
+#    depends_on:
+#      - kafka
+#    networks:
+#      - local
+#
+#  exchangerate:
+#    build: ./ExchangeRateService
+#    container_name: ExchangeRateService
+#    ports:
+#      - 8083:8083
+#    depends_on:
+#      - kafka
+#    networks:
+#      - local
+
 networks:
 
   local:

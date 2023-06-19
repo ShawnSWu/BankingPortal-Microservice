@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void mockValidate(String account, String password){
-        if (!StringUtils.equals(account,"Shawn") && !StringUtils.equals(password,"pwd")) {
+        if (!StringUtils.equals(account,"Shawn") || !StringUtils.equals(password,"pwd")) {
             throw new UsernameNotFoundException("Log in failed with username: " + account);
         }
     }

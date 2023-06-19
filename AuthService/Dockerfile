@@ -1,5 +1,7 @@
 FROM openjdk:11
 MAINTAINER swshawnwu@gmail.com
-COPY target/AuthService-1.0-SNAPSHOT.jar /app.jar
+COPY ./build/libs/AuthService.jar /AuthService.jar
 EXPOSE 8080
-CMD java -jar app.jar
+ENV SPRING_PROFILES_ACTIVE=dev
+CMD ./gradlew clean bootJar
+CMD java -jar AuthService.jar

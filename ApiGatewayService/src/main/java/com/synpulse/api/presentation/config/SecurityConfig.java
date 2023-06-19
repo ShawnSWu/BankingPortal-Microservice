@@ -84,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             HttpHeaders headers = new HttpHeaders();
 
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.add(HttpHeaders.AUTHORIZATION, authXApiKey);
+            headers.add("x-api-key", authXApiKey);
 
             Map<String, String> body = Collections.singletonMap("token", token);
 

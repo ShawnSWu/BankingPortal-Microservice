@@ -1,5 +1,7 @@
 FROM openjdk:11
 MAINTAINER swshawnwu@gmail.com
-COPY target/ExchangeRateService-1.0-SNAPSHOT.jar /app.jar
+COPY ./build/libs/ExchangeRateService.jar /ExchangeRateService.jar
 EXPOSE 8080
-CMD java -jar app.jar
+ENV SPRING_PROFILES_ACTIVE=dev
+CMD ./gradlew clean bootJar
+CMD java -jar ExchangeRateService.jar

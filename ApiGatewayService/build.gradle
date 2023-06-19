@@ -17,6 +17,10 @@ dependencies {
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
 }
 
+bootJar {
+    archiveFileName="ApiGatewayService.jar"
+}
+
 test {
     useJUnitPlatform()
 }

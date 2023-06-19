@@ -1,5 +1,6 @@
 FROM openjdk:11
 MAINTAINER swshawnwu@gmail.com
-COPY target/TransactionManagementService-1.0-SNAPSHOT.jar /app.jar
+COPY ./build/libs/TransactionManagementService.jar /TransactionManagementService.jar
 EXPOSE 8080
-CMD java -jar app.jar
+CMD ./gradlew clean build jar
+CMD java -jar TransactionManagementService.jar

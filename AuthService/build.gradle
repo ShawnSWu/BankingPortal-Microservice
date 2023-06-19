@@ -23,6 +23,10 @@ dependencies {
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.2'
 }
 
+bootJar {
+    archiveFileName="AuthService.jar"
+}
+
 test {
     useJUnitPlatform()
 }
