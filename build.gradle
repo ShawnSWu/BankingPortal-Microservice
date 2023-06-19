@@ -1,0 +1,47 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.2'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group 'org.synpulse'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: SPRING_BOOT_VERSION
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: SPRING_BOOT_VERSION
+
+        implementation 'org.springframework.boot:spring-boot-configuration-processor'
+
+        //Lombok
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: LOMBOK_VERSION
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: LOMBOK_VERSION
+        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: LOMBOK_VERSION
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: LOMBOK_VERSION
+
+        // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+        implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+
+        //Test
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: SPRING_BOOT_VERSION
+    }
+
+
+}

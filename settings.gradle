@@ -1,0 +1,6 @@
+rootProject.name = 'BankingPortal-Microservice'
+include 'AuthService'
+include 'TransactionManagementService'
+include 'ApiGatewayService'
+include 'ExchangeRateService'
+

@@ -1,0 +1,18 @@
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+build
+.gradle
+.idea/
+
+.mvn/
+
+
+
+target/
+
+!**/src/main/**/target/
+!**/src/test/**/target/
