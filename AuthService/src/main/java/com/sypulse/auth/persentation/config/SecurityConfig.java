@@ -1,28 +1,42 @@
 package com.sypulse.auth.persentation.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration
+import java.util.Collections;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
-    @Value("${x-api-key}")
-    private String xApiKey;
+    @Autowired
+    PasswordEncoder getPasswordEncoder;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/cp/error", "/api/v1/login").permitAll()
-                .antMatchers("/**")
-                .access("request.getHeader('x-api-key') != null && request.getHeader('x-api-key').equals('" + xApiKey + "')")
-                .and()
-                .httpBasic();
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeRequests(authorizeRequests ->
+                        authorizeRequests.anyRequest().authenticated()
+                ).formLogin(withDefaults());
+        return http.build();
+    }
+
+    @Bean
+    UserDetailsService users() {
+        UserDetails user = User.withDefaultPasswordEncoder()
+                .username("admin")
+                .password(getPasswordEncoder.encode("password"))
+                .authorities(Collections.emptyList())
+                .build();
+        return new InMemoryUserDetailsManager(user);
     }
 
 }
