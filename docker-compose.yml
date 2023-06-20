@@ -18,7 +18,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "query_transaction_v1"
+      KAFKA_CREATE_TOPICS: "query-transaction-v1"
     depends_on:
       - zookeeper
     networks:
@@ -44,21 +44,11 @@ services:
     networks:
       - local
 
-#  transaction:
-#    build: ./TransactionManagementService
-#    container_name: TransactionManagementService
-#    ports:
-#      - 8082:8082
-#    depends_on:
-#      - kafka
-#    networks:
-#      - local
-#
-  exchangerate:
-    build: ./ExchangeRateService
-    container_name: ExchangeRateService
+  transaction:
+    build: ./TransactionManagementService
+    container_name: TransactionManagementService
     ports:
-      - 8083:8083
+      - 8082:8082
     depends_on:
       - kafka
     networks:

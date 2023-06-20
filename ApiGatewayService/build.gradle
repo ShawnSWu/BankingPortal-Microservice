@@ -15,6 +15,12 @@ dependencies {
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUNIT_VERSION
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUNIT_VERSION
+
+//    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+//    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+
 }
 
 bootJar {

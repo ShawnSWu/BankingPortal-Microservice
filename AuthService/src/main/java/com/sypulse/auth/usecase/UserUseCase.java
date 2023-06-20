@@ -4,6 +4,7 @@ import com.sypulse.auth.domain.BankUser;
 import com.sypulse.auth.domain.JwtTokenService;
 import com.sypulse.auth.domain.UserService;
 import com.sypulse.auth.persentation.dto.LoginRequest;
+import com.sypulse.auth.persentation.dto.UserTokenInfo;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,11 +19,11 @@ public class UserUseCase {
     }
 
     public String login(LoginRequest loginRequest) {
-        BankUser userDetails = userService.login(loginRequest.getAccount(), loginRequest.getPassword());
-        return jwtTokenService.generateToken(userDetails);
+        BankUser bankUser = userService.login(loginRequest.getAccount(), loginRequest.getPassword());
+        return jwtTokenService.generateToken(bankUser);
     }
 
-    public void verifyToken(String token) {
-        jwtTokenService.validateTokenSecret(token);
+    public UserTokenInfo verifyToken(String token) {
+        return jwtTokenService.validateTokenSecret(token);
     }
 }

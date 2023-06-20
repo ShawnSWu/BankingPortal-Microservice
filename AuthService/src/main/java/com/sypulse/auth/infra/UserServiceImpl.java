@@ -20,13 +20,25 @@ public class UserServiceImpl implements UserService {
 //                .orElseThrow(() -> {
 //                    throw new UsernameNotFoundException("Log in failed with username: " + account);
 //                });
-        //for test
         mockValidate(account, password);
-        return BankUser.builder().id("P-0123456789").build();
+        //Mock User
+        BankUser bankUser = BankUser.builder()
+                .id("P-0123456789")
+                .email("swshawnwu@gmail.com")
+                .firstName("Shawn")
+                .lastName("Wu")
+                .build();
+
+        return BankUser.builder()
+                .id(bankUser.getId())
+                .email(bankUser.getEmail())
+                .lastName(bankUser.getLastName())
+                .firstName(bankUser.getFirstName())
+                .build();
     }
 
-    private void mockValidate(String account, String password){
-        if (!StringUtils.equals(account,"Shawn") || !StringUtils.equals(password,"pwd")) {
+    private void mockValidate(String account, String password) {
+        if (!StringUtils.equals(account, "ShawnWu") || !StringUtils.equals(password, "hashPwd")) {
             throw new UsernameNotFoundException("Log in failed with username: " + account);
         }
     }

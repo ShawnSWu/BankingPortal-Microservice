@@ -3,6 +3,7 @@ package com.sypulse.auth.persentation.controller;
 import com.sypulse.auth.persentation.dto.AuthTokenRequest;
 import com.sypulse.auth.persentation.dto.LoginRequest;
 import com.sypulse.auth.persentation.dto.LoginResponse;
+import com.sypulse.auth.persentation.dto.UserTokenInfo;
 import com.sypulse.auth.usecase.UserUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +26,10 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<?> verifyToken(@RequestBody AuthTokenRequest authTokenRequest) {
+    public ResponseEntity<UserTokenInfo> verifyToken(@RequestBody AuthTokenRequest authTokenRequest) {
         String token = authTokenRequest.getToken();
-        userUseCase.verifyToken(token);
-        return ResponseEntity.ok("");
+        UserTokenInfo bankUser = userUseCase.verifyToken(token);
+        return ResponseEntity.ok(bankUser);
     }
 
 }

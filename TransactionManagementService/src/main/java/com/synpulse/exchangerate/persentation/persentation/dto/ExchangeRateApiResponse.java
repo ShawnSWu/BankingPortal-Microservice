@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ExchangeRateApiResponse {
     private boolean success;
 
