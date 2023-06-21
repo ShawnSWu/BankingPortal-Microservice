@@ -16,6 +16,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-authorization-server
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-authorization-server', version: '0.3.1'
 
+    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: SWAGGER_VERSION
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: SWAGGER_VERSION
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: SWAGGER_VERSION
+
+
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUNIT_VERSION

@@ -38,30 +38,32 @@ services:
       - ./kafka1/data:/bitnami/kafka/data
       - ./kafka1/logs:/bitnami/kafka/logs
 
-  kafka2:
-    image: confluentinc/cp-kafka:latest
-    hostname: kafka2
-    container_name: kafka2
-    ports:
-      - '9093:9093'
-    environment:
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
-      - KAFKA_LISTENERS=PLAINTEXT://:9093
-      - KAFKA_BROKER_ID=2
-      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=2
-      - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
-      - KAFKA_KRAFT_NUM_REPLICAS=2
-      - KAFKA_KRAFT_NUM_PARTITIONS=3
-    depends_on:
-      - zookeeper
-    networks:
-      - local
-    volumes:
-      - ./kafka2/data:/bitnami/kafka/data
-      - ./kafka2/logs:/bitnami/kafka/logs
+#  kafka2:
+#    image: confluentinc/cp-kafka:latest
+#    hostname: kafka2
+#    container_name: kafka2
+#    ports:
+#      - '9093:9093'
+#    environment:
+#      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+#      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9093
+#      - KAFKA_LISTENERS=PLAINTEXT://:9093
+#      - KAFKA_BROKER_ID=2
+#      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+#      - ALLOW_PLAINTEXT_LISTENER=yes
+#      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=2
+#      - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
+#      - KAFKA_KRAFT_NUM_REPLICAS=2
+#      - KAFKA_KRAFT_NUM_PARTITIONS=3
+#      - KAFKA_DEFAULT_TOPIC=query_transaction_v1
+#      - KAFKA_DEFAULT_GROUP_ID=transaction_group
+#    depends_on:
+#      - zookeeper
+#    networks:
+#      - local
+#    volumes:
+#      - ./kafka2/data:/bitnami/kafka/data
+#      - ./kafka2/logs:/bitnami/kafka/logs
 networks:
   local:
     driver: bridge

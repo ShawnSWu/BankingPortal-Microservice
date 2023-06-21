@@ -23,9 +23,16 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests(authorizeRequests ->
-                        authorizeRequests.anyRequest().authenticated()
-                ).formLogin(withDefaults());
+        http
+                .authorizeRequests(authorizeRequests ->
+                        authorizeRequests
+                                .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs").permitAll()
+                                .anyRequest()
+                                .authenticated()
+                )
+                .cors()
+                .and()
+                .formLogin(withDefaults());
         return http.build();
     }
 

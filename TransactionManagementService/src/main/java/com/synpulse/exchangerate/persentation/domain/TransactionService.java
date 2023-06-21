@@ -31,11 +31,12 @@ public class TransactionService {
 
     public List<TransactionRecord> queryRecord(QueryTransactionRequest transactionRequest) throws ExchangeRateApiException {
         //query from kafka
+        System.out.println("笑死！");
         String targetDate = transactionRequest.getTargetDate();
         String userId = transactionRequest.getUserId();
 
         double usd = retrieveExchangeRateApiByCurrency(targetDate, "USD");
-
+        System.out.println("笑死");
 
         return new ArrayList<>();
     }

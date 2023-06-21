@@ -1,6 +1,6 @@
-package com.synpulse.exchangerate.persentation;
+package com.synpulse.api;
 
-import com.synpulse.exchangerate.persentation.persentation.dto.QueryTransactionRequest;
+import com.synpulse.api.presentation.dto.QueryTransactionRequest;
 import org.apache.kafka.clients.producer.*;
 
 import java.util.Properties;
@@ -10,7 +10,7 @@ public class KafkaMessageProducer {
     public static void main(String[] args) {
 
         // Kafka server
-        String bootstrapServers = "kafka:9092";
+        String bootstrapServers = "localhost:9092";
 
         // Kafka producer config
         Properties properties = new Properties();
@@ -19,15 +19,19 @@ public class KafkaMessageProducer {
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
         // create Kafka producer
-        KafkaProducer<String, QueryTransactionRequest> producer = new KafkaProducer<>(properties);
+        KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
 
-        String topic = "query-transaction-v1";
+        String topic = "query_transaction_v1";
         String key = "message-key";
-        QueryTransactionRequest value = new QueryTransactionRequest(/* 设置消息的参数 */);
+
+        QueryTransactionRequest value = QueryTransactionRequest.builder()
+                .userId("A123")
+                .targetDate("2023-06-19")
+                .build();
 
         // create Kafka message
-        ProducerRecord<String, QueryTransactionRequest> record = new ProducerRecord<>(topic, key, value);
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, "value");
 
         producer.send(record, new Callback() {
             @Override

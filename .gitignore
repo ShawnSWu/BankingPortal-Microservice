@@ -10,7 +10,8 @@ build
 
 .mvn/
 
-
+kafka1
+kafka2
 
 target/
 
