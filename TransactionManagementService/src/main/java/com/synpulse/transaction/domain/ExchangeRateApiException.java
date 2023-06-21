@@ -1,4 +1,4 @@
-package com.synpulse.exchangerate.persentation.domain;
+package com.synpulse.transaction.domain;
 
 public class ExchangeRateApiException extends Exception {
 

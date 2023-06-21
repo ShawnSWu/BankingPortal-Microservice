@@ -1,4 +1,4 @@
-package com.synpulse.exchangerate.persentation.domain.model;
+package com.synpulse.transaction.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

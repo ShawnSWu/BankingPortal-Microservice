@@ -1,16 +1,16 @@
 package com.synpulse.api.presentation.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.io.Serializable;
 
 
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class QueryTransactionRequest {
+public class QueryTransactionRequest implements Serializable {
     private String userId;
     private String targetDate;
 }

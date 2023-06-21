@@ -27,8 +27,8 @@ public class TransactionController {
     )
     public void getMoneyTransaction(@RequestParam String userId, @RequestParam String date) {
         QueryTransactionRequest request = QueryTransactionRequest.builder()
-                .userId("0-1234567")
-                .targetDate("2023-06-18")
+                .userId(userId)
+                .targetDate(date)
                 .build();
         kafkaProducer.sendMessage(request);
     }

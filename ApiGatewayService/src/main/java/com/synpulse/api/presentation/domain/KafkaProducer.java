@@ -20,6 +20,5 @@ public class KafkaProducer {
 
     public void sendMessage(QueryTransactionRequest request) {
         kafkaTemplate.send(TOPIC_NAME, request);
-        System.out.println("傳送成功!!!!!!");
     }
 }

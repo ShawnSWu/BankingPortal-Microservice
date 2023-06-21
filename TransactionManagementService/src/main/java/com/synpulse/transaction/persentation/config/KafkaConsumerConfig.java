@@ -1,6 +1,6 @@
-package com.synpulse.exchangerate.persentation.persentation;
+package com.synpulse.transaction.persentation.config;
 
-import com.synpulse.exchangerate.persentation.persentation.dto.QueryTransactionRequest;
+import com.synpulse.transaction.persentation.dto.QueryTransactionRequest;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +40,7 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, QueryTransactionRequest> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.getContainerProperties().setPollTimeout(5000);
         return factory;
     }
 }

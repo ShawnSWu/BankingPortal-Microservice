@@ -1,4 +1,4 @@
-package com.synpulse.exchangerate.persentation.persentation.dto;
+package com.synpulse.transaction.persentation.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

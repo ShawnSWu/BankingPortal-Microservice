@@ -1,8 +1,8 @@
 package com.sypuluse.transaction;
 
-import com.synpulse.exchangerate.persentation.TransactionManagementApplication;
-import com.synpulse.exchangerate.persentation.domain.ExchangeRateApiException;
-import com.synpulse.exchangerate.persentation.domain.TransactionService;
+import com.synpulse.transaction.TransactionManagementApplication;
+import com.synpulse.transaction.domain.ExchangeRateApiException;
+import com.synpulse.transaction.domain.TransactionService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

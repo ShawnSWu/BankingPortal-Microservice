@@ -1,8 +1,8 @@
-package com.synpulse.exchangerate.persentation.domain;
+package com.synpulse.transaction.domain;
 
-import com.synpulse.exchangerate.persentation.domain.model.TransactionRecord;
-import com.synpulse.exchangerate.persentation.persentation.dto.ExchangeRateApiResponse;
-import com.synpulse.exchangerate.persentation.persentation.dto.QueryTransactionRequest;
+import com.synpulse.transaction.domain.model.TransactionRecord;
+import com.synpulse.transaction.persentation.dto.ExchangeRateApiResponse;
+import com.synpulse.transaction.persentation.dto.QueryTransactionRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class TransactionService {
         String userId = transactionRequest.getUserId();
 
         double usd = retrieveExchangeRateApiByCurrency(targetDate, "USD");
-        System.out.println("笑死");
+        System.out.println(usd);
 
         return new ArrayList<>();
     }
