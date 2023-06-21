@@ -2,59 +2,87 @@ version: "3"
 
 services:
   zookeeper:
-    image: wurstmeister/zookeeper
+    image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 2181:2181
+      - "2181:2181"
     networks:
       - local
 
-  kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
+  kafka1:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka1
     ports:
-      - 9092:9092
+      - '9092:9092'
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: kafka
-      KAFKA_ADVERTISED_PORT: 9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "query-transaction-v1"
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_BROKER_ID=1
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
     networks:
       - local
+    volumes:
+      - ./kafka1/data:/bitnami/kafka/data
+      - ./kafka1/logs:/bitnami/kafka/logs
 
-  api:
-    build: ./ApiGatewayService
-    container_name: ApiGatewayService
+  kafka2:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka2
     ports:
-      - 8080:8080
+      - '9093:9093'
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka2:9093
+      - KAFKA_LISTENERS=PLAINTEXT://:9093
+      - KAFKA_BROKER_ID=2
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
-      - kafka
+      - zookeeper
     networks:
       - local
+    volumes:
+      - ./kafka2/data:/bitnami/kafka/data
+      - ./kafka2/logs:/bitnami/kafka/logs
 
-  auth:
-    build: ./AuthService
-    container_name: AuthService
-    ports:
-      - 8081:8081
-    depends_on:
-      - kafka
-    networks:
-      - local
-
-  transaction:
-    build: ./TransactionManagementService
-    container_name: TransactionManagementService
-    ports:
-      - 8082:8082
-    depends_on:
-      - kafka
-    networks:
-      - local
+#
+#  api:
+#    build: ./ApiGatewayService
+#    container_name: ApiGatewayService
+#    ports:
+#      - 8080:8080
+#    depends_on:
+#      - kafka
+#    networks:
+#      - local
+#
+#  auth:
+#    build: ./AuthService
+#    container_name: AuthService
+#    ports:
+#      - 9000:9000
+#    depends_on:
+#      - kafka
+#    networks:
+#      - local
+#
+#  transaction:
+#    build: ./TransactionManagementService
+#    container_name: TransactionManagementService
+#    ports:
+#      - 8082:8082
+#    depends_on:
+#      - kafka
+#    networks:
+#      - local
 
 networks:
-
   local:
     driver: bridge
