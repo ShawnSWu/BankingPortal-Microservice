@@ -17,18 +17,17 @@ services:
     container_name: kafka1
     hostname: kafka1
     ports:
-      - '9092:9092'
+      - '29092:29092'
     environment:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:29092
-      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
       - KAFKA_BROKER_ID=1
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
-      - KAFKA_KRAFT_NUM_REPLICAS=2
-      - KAFKA_KRAFT_NUM_PARTITIONS=3
+      - KAFKA_KRAFT_NUM_REPLICAS=1
+      - KAFKA_KRAFT_NUM_PARTITIONS=1
     depends_on:
       - zookeeper
     networks:
@@ -47,8 +46,8 @@ services:
     ports:
       - "8088:8088"
     environment:
-      KSQL_LISTENERS: http://ksqldb-server:8088
-      KSQL_BOOTSTRAP_SERVERS: http://kafka1:9092
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_BOOTSTRAP_SERVERS: kafka1:9092
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
       KSQL_KSQL_CONNECT_WORKER_CONFIG: "/connect/connect.properties"
@@ -58,16 +57,6 @@ services:
     networks:
       - local
 
-  ksqldb-cli:
-    image: confluentinc/ksqldb-cli:0.6.0
-    container_name: ksqldb-cli
-    depends_on:
-      - kafka1
-      - ksqldb-server
-    entrypoint: /bin/sh
-    tty: true
-    networks:
-      - local
 
 networks:
   local:
