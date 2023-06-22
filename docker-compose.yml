@@ -24,6 +24,7 @@ services:
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:29092
       - KAFKA_BROKER_ID=1
       - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
       - KAFKA_KRAFT_NUM_REPLICAS=1
@@ -57,6 +58,16 @@ services:
     networks:
       - local
 
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli:0.6.0
+    container_name: ksqldb-cli
+    depends_on:
+      - kafka1
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true
+    networks:
+      - local
 
 networks:
   local:
