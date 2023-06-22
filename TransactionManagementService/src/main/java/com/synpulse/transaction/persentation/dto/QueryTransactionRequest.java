@@ -14,4 +14,5 @@ import java.io.Serializable;
 public class QueryTransactionRequest implements Serializable {
     private String userId;
     private String targetDate;
+    private int pageSize;
 }

@@ -3,16 +3,18 @@ package com.synpulse.transaction.domain;
 import com.synpulse.transaction.domain.model.TransactionRecord;
 import com.synpulse.transaction.persentation.dto.ExchangeRateApiResponse;
 import com.synpulse.transaction.persentation.dto.QueryTransactionRequest;
+import com.synpulse.transaction.persentation.dto.QueryTransactionResponse;
+import com.synpulse.transaction.persentation.dto.TransactionRecordDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class TransactionService {
@@ -29,15 +31,7 @@ public class TransactionService {
         this.restTemplate = restTemplate;
     }
 
-    public List<TransactionRecord> queryRecord(QueryTransactionRequest transactionRequest) throws ExchangeRateApiException {
-        //query from kafka
-        System.out.println("笑死！");
-        String targetDate = transactionRequest.getTargetDate();
-        String userId = transactionRequest.getUserId();
-
-        double usd = retrieveExchangeRateApiByCurrency(targetDate, "USD");
-        System.out.println(usd);
-
+    public List<TransactionRecord> queryRecord(QueryTransactionRequest transactionRequest) {
         return new ArrayList<>();
     }
 
@@ -60,6 +54,52 @@ public class TransactionService {
             throw new ExchangeRateApiException("Not found the currency code you query.");
         }
         return rates.get(queryTargetCurrency);
+    }
+
+    public QueryTransactionResponse getTransactionTotalCreditAndDebit(QueryTransactionRequest request) throws ExchangeRateApiException {
+        //query to get record
+        List<TransactionRecord> transactions = queryRecord(request);
+
+        List<TransactionRecordDTO> transactionDTOs = new ArrayList<>();
+
+        double totalCredit = 0.0;
+        double totalDebit = 0.0;
+
+        for (TransactionRecord transaction : transactions) {
+            String transactionDate = convertDate(transaction.getValueDate(), "yyyy-MM-dd");
+            double exchangeRate = retrieveExchangeRateApiByCurrency(transactionDate, transaction.getCurrency()); //TODO Need optimal, Shouldn't call api every time
+
+            BigDecimal convertedAmount = transaction.getAmount().multiply(BigDecimal.valueOf(exchangeRate));
+            double amountDoubleValue = convertedAmount.doubleValue();
+
+            TransactionRecordDTO recordDto = TransactionRecordDTO.builder()
+                    .id(transaction.getId())
+                    .amount(amountDoubleValue)
+                    .currency(transaction.getCurrency())
+                    .accountIBAN(transaction.getAccountIban())
+                    .valueDate(transaction.getValueDate())
+                    .description(transaction.getDescription())
+                    .build();
+
+            transactionDTOs.add(recordDto);
+
+            if (amountDoubleValue >= 0) {
+                totalCredit += amountDoubleValue;
+            } else {
+                totalDebit += amountDoubleValue;
+            }
+        }
+
+        return QueryTransactionResponse.builder()
+                .items(transactionDTOs)
+                .totalCredit(totalCredit)
+                .totalDebit(totalDebit)
+                .build();
+    }
+
+    private static String convertDate(Date date, String format) {
+        DateFormat dateFormat = new SimpleDateFormat(format);
+        return dateFormat.format(date);
     }
 
 }
