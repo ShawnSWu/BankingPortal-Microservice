@@ -52,3 +52,12 @@ Due to time constraints, plaintext transmission is currently used in Brokers for
 It should be encryption in the future.
 * Improve CI/CD pipeline and K8S:
 The configuration of CircleCI and Kubernetes (K8S) for continuous integration and continuous deployment (CI/CD) is still incomplete and requires further refinement.
+
+
+# My experience
+This is my first time delving into another facet of Kafka, specifically its『data storage functionality.』
+In the past, my experience with Kafka was primarily centered around using it as a messaging queue mechanism. Therefore, in this project, I've been learning and implementing KsqlDB along the way. 
+This project has been a great learning experience. Although time limitations prevented me from achieving perfection in the KsqlDB portion, 
+I am determined to continue working on and completing this project. Until now, I still keep working on this project
+
+I'd like to express my sincere gratitude to the Sympulse team for giving me this opportunity to take this challenge.

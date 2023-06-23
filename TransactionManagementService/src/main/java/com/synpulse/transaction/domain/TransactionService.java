@@ -6,20 +6,19 @@ import com.synpulse.transaction.persentation.dto.QueryTransactionRequest;
 import com.synpulse.transaction.persentation.dto.QueryTransactionResponse;
 import com.synpulse.transaction.persentation.dto.TransactionRecordDTO;
 import com.synpulse.transaction.utils.DateUtils;
-import io.confluent.ksql.api.client.BatchedQueryResult;
-import io.confluent.ksql.api.client.Client;
-import io.confluent.ksql.api.client.ClientOptions;
+import io.confluent.ksql.api.client.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class TransactionService {
@@ -32,31 +31,76 @@ public class TransactionService {
     @Value("${exchangerate.access.key}")
     private String exchangeRateApiKey;
 
+    @Value("${ksqldb.server}")
+    private String ksqlDbServer;
+
+    @Value("${ksqldb.server.port}")
+    private String ksqlDbServerPort;
+
+    @Autowired
+    private KafkaTemplate<String, QueryTransactionResponse> kafkaProducer;
+
+    @Value("${query.response.topic}")
+    private String queryResponseTopic;
+
     public TransactionService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public List<TransactionRecord> queryRecord(QueryTransactionRequest transactionRequest) throws ParseException {
-        String userId = transactionRequest.getUserId();
+    public QueryTransactionResponse getTransactionRecords(QueryTransactionRequest transactionRequest)
+            throws ParseException, ExecutionException, InterruptedException {
+        String queryUserId = transactionRequest.getUserId();
         Date targetDate = DateUtils.convertByFormat(transactionRequest.getTargetDate(), "yyyy-MM-dd");
 
         String queryKSql = String.format("SELECT * FROM transaction_table " +
-                "WHERE id > %s AND valueDate = %d;", userId, targetDate.getTime());
-
-
-        String serverEndpoint = "localhost";
+                "WHERE userId = %s AND valueDate = %d;", queryUserId, targetDate.getTime());
 
         // Create ksqlDB client options
         ClientOptions options = ClientOptions.create()
-                .setHost(serverEndpoint)
-                .setPort(8088);
+                .setHost(ksqlDbServer)
+                .setPort(Integer.parseInt(ksqlDbServerPort));
 
-        // Create ksqlDB client
-        Client client = Client.create(options);
 
-        BatchedQueryResult batchedQueryResult = client.executeQuery(queryKSql);
+        try (Client client = Client.create(options)) {
 
-        return new ArrayList<>();
+            ExecuteStatementResult executeStatementResult = client.executeStatement(queryKSql, null).get();
+
+            // Get the query ID
+            String queryId = executeStatementResult.queryId().get();
+
+            // Poll for query results
+            BatchedQueryResult queryResult = client.executeQuery(queryId);
+
+            List<TransactionRecord> transactionRecords = new ArrayList<>();
+            while (!queryResult.isComplete()) {
+                for (Row row : queryResult.getRows()) {
+                    String id = row.getString("id");
+                    String userId = row.getString("userId");
+                    BigDecimal amount = row.getDecimal("amount");
+                    String currency = row.getString("currency");
+                    String accountIban = row.getString("accountIban");
+                    String date = row.getString("valueDate");
+                    String description = row.getString("description");
+
+                    transactionRecords.add(TransactionRecord.builder()
+                            .id(id)
+                            .userId(userId)
+                            .amount(amount)
+                            .currency(currency)
+                            .accountIban(accountIban)
+                            .valueDate(new Date(date))
+                            .description(description)
+                            .build());
+                }
+
+                // Get the next query result
+                queryResult = client.poll(queryId);
+            }
+
+            // Cancel the query
+            client.executeStatement("TERMINATE " + queryId + ";");
+        }
+        return getTransactionTotalCreditAndDebit(transactionRecords);
     }
 
     public double retrieveExchangeRateApiByCurrency(String date, String queryTargetCurrency) throws ExchangeRateApiException {
@@ -80,10 +124,7 @@ public class TransactionService {
         return rates.get(queryTargetCurrency);
     }
 
-    public QueryTransactionResponse getTransactionTotalCreditAndDebit(QueryTransactionRequest request) throws ExchangeRateApiException, ParseException {
-        //query to get record
-        List<TransactionRecord> transactions = queryRecord(request);
-
+    public QueryTransactionResponse getTransactionTotalCreditAndDebit(List<TransactionRecord> transactions) throws ExchangeRateApiException, ParseException {
         List<TransactionRecordDTO> transactionDTOs = new ArrayList<>();
 
         double totalCredit = 0.0;

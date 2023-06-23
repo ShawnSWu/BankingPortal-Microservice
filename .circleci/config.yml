@@ -1,0 +1,25 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:11.0.3-jdk-stretch
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - sample-springboot-api-{{ checksum "build.gradle" }}-{{ checksum "settings.gradle" }}
+
+      - run: ./gradlew dependencies
+
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+          key: sample-springboot-api-{{ checksum "build.gradle" }}-{{ checksum "settings.gradle" }}
+
+      - run:
+          name: run testing
+          command: ./gradlew test
+
+      - run: ./gradlew clean bootjar

@@ -4,11 +4,15 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.sypulse.auth.domain.AccountRepository;
+import com.sypulse.auth.infra.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -34,11 +38,15 @@ public class AuthorizationServerConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String authServerUrl;
 
+    @Autowired
+    private AccountRepository accountRepository;
+
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
-        RegisteredClient apiGatewayClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("api-gateway-client")
-                .clientSecret(getPasswordEncoder().encode("api-gateway-client-secret"))
+        //Replace DB query
+        RegisteredClient demoClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("0-123456789") //user’s unique identity key
+                .clientSecret(getPasswordEncoder().encode("Shawn-secret"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
@@ -46,16 +54,13 @@ public class AuthorizationServerConfig {
                 .tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.ofDays(1)).build())
                 .build();
 
-        RegisteredClient transactionClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("transaction-client")
-                .clientSecret(getPasswordEncoder().encode("transaction-client-secret"))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .scope("read")
-                .tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.ofDays(1)).build())
-                .build();
-        return new InMemoryRegisteredClientRepository(apiGatewayClient, transactionClient);
+        return new InMemoryRegisteredClientRepository(demoClient);
+    }
+
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsServiceImpl(accountRepository);
     }
 
     @Bean

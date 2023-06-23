@@ -1,4 +1,4 @@
-package com.sypulse.auth.domain;
+package com.sypulse.auth.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,20 +7,23 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-
 @Entity
-@Table(name = "BANK_USER")
-public class BankUser {
+@Table(name = "ACCOUNT")
+public class Account {
 
     @Id
     @Column(name = "ID")
-    @GeneratedValue(strategy = GenerationType.TABLE)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
+    @Column(name = "IDENTITY_KEY")
+    private String identityKey;
 
     @Column(name = "ACCOUNT")
     private String account;
@@ -42,5 +45,11 @@ public class BankUser {
 
     @Column(name = "LAST_PASSWORD_UPDATE_AT")
     private Date lastPasswordUpdateAt;
+
+
+    @Column(name = "ACCOUNT_CURRENCY")
+    @OneToMany(targetEntity= CurrencyBalance.class, cascade=CascadeType.ALL)
+    private List<CurrencyBalance> currencyAccounts;
+
 
 }

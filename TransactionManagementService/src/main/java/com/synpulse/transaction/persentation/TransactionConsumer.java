@@ -11,10 +11,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class TransactionConsumer {
@@ -36,20 +38,22 @@ public class TransactionConsumer {
         this.transactionService = transactionService;
     }
 
-    @KafkaListener(topics = "query_transaction_v1", groupId = "transaction_group")
+    @KafkaListener(topics = "query_transaction_v1", groupId = "transaction_group", topicPartitions = {TopicPartition})
     public void consumeTransaction(String request) {
         try {
             QueryTransactionRequest queryTransactionRequest = objectMapper.readValue(request, QueryTransactionRequest.class);
 
-            QueryTransactionResponse queryTransactionResponse = transactionService.getTransactionTotalCreditAndDebit(queryTransactionRequest);
+            QueryTransactionResponse transactionRecords = transactionService.getTransactionRecords(queryTransactionRequest);
 
-            notifyResponseTopic(queryTransactionResponse);
+            notifyResponseTopic(transactionRecords);
         } catch (JsonProcessingException e) {
             logger.error(String.format("Error processing JSON: %s, cause: %s", request, e.getMessage()));
         } catch (ExchangeRateApiException e) {
             logger.error(String.format("ExchangeRateApiException, cause: %s", e.getMessage()));
         } catch (ParseException e) {
             logger.error(String.format("ParseException, cause: %s", e.getMessage()));
+        } catch (ExecutionException e) {
+            logger.error(String.format("ExecutionException, cause: %s", e.getMessage()));
         }
     }
 
