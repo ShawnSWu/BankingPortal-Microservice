@@ -10,7 +10,7 @@ public class KafkaMessageProducer {
     public static void main(String[] args) {
 
         // Kafka server
-        String bootstrapServers = "localhost:9092";
+        String bootstrapServers = "localhost:19092";
 
         // Kafka producer config
         Properties properties = new Properties();

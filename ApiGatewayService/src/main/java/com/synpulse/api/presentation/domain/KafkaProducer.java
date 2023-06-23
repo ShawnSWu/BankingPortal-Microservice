@@ -19,6 +19,7 @@ public class KafkaProducer {
     }
 
     public void sendMessage(QueryTransactionRequest request) {
-        kafkaTemplate.send(TOPIC_NAME, request);
+        //Sticky Partition
+        kafkaTemplate.send(TOPIC_NAME,  request);
     }
 }

@@ -12,6 +12,14 @@ build
 
 kafka1
 kafka2
+kafka3
+
+zookeeper1
+zookeeper2
+zookeeper3
+
+confluentinc-kafka-connect-jdbc-10.7.3
+connect.properties
 
 target/
 

@@ -1,41 +1,134 @@
 version: "3"
 
 services:
-  zookeeper:
+  zookeeper1:
     image: confluentinc/cp-zookeeper:latest
-    container_name: zookeeper
+    container_name: zookeeper1
+    hostname: zookeeper1
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
     ports:
-      - "2181:2181"
+      - '12181:2181'
     networks:
-      - local
+      - kafka-net
+    volumes:
+      - ./zookeeper1/data:/var/lib/zookeeper/data
+      - ./zookeeper1/logs:/var/lib/zookeeper/logs
+
+  zookeeper2:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper2
+    hostname: zookeeper2
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+    ports:
+      - '22181:2181'
+    networks:
+      - kafka-net
+    volumes:
+      - ./zookeeper2/data:/var/lib/zookeeper/data
+      - ./zookeeper2/logs:/var/lib/zookeeper/logs
+
+  zookeeper3:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper3
+    hostname: zookeeper3
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+    ports:
+      - '32181:2181'
+    networks:
+      - kafka-net
+    volumes:
+      - ./zookeeper1/data:/var/lib/zookeeper/data
+      - ./zookeeper1/logs:/var/lib/zookeeper/logs
 
   kafka1:
     image: confluentinc/cp-kafka:latest
     container_name: kafka1
     hostname: kafka1
     ports:
-      - '29092:29092'
+      - '19092:19092'
     environment:
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:29092
       - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:19092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
-      - KAFKA_KRAFT_NUM_REPLICAS=1
-      - KAFKA_KRAFT_NUM_PARTITIONS=1
+      - KAFKA_KRAFT_NUM_REPLICAS=3
+      - KAFKA_KRAFT_NUM_PARTITIONS=3
     depends_on:
-      - zookeeper
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
     networks:
-      - local
+      - kafka-net
     volumes:
       - ./kafka1/data:/confluentinc/kafka/data
       - ./kafka1/logs:/confluentinc/kafka/logs
+
+  kafka2:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka2
+    hostname: kafka2
+    ports:
+      - '29092:29092'
+    environment:
+      - KAFKA_BROKER_ID=2
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka2:9092,PLAINTEXT_HOST://localhost:29092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
+      - KAFKA_KRAFT_NUM_REPLICAS=3
+      - KAFKA_KRAFT_NUM_PARTITIONS=3
+    depends_on:
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
+    networks:
+      - kafka-net
+    volumes:
+      - ./kafka2/data:/confluentinc/kafka/data
+      - ./kafka2/logs:/confluentinc/kafka/logs
+
+  kafka3:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka3
+    hostname: kafka3
+    ports:
+      - '39092:39092'
+    environment:
+      - KAFKA_BROKER_ID=3
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka3:9092,PLAINTEXT_HOST://localhost:39092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
+      - KAFKA_KRAFT_NUM_REPLICAS=3
+      - KAFKA_KRAFT_NUM_PARTITIONS=3
+    depends_on:
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
+    networks:
+      - kafka-net
+    volumes:
+      - ./kafka3/data:/confluentinc/kafka/data
+      - ./kafka3/logs:/confluentinc/kafka/logs
 
 
   ksqldb-server:
@@ -44,6 +137,11 @@ services:
     container_name: ksqldb-server
     depends_on:
       - kafka1
+      - kafka2
+      - kafka3
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
     ports:
       - "8088:8088"
     environment:
@@ -56,51 +154,74 @@ services:
       - ./confluentinc-kafka-connect-jdbc-10.7.3:/usr/share/kafka/plugins/jdbc
       - ./connect.properties:/connect/connect.properties
     networks:
-      - local
+      - kafka-net
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.6.0
     container_name: ksqldb-cli
     depends_on:
-      - kafka1
       - ksqldb-server
     entrypoint: /bin/sh
     tty: true
     networks:
-      - local
+      - kafka-net
+
+  api:
+    build: ./ApiGatewayService
+    hostname: api
+    container_name: api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+      - zookeeper1
+      - zookeeper3
+      - zookeeper2
+    environment:
+      - SPRING_PROFILES_ACTIVE=prd
+    networks:
+      - kafka-net
+
+  auth:
+    build: ./AuthService
+    container_name: auth
+    hostname: auth
+    ports:
+      - "9000:9000"
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
+    environment:
+      - SPRING_PROFILES_ACTIVE=prd
+    networks:
+      - kafka-net
+
+  transaction:
+    build: ./TransactionManagementService
+    container_name: transaction
+    hostname: transaction
+    ports:
+      - 8082:8082
+    environment:
+      - SPRING_PROFILES_ACTIVE=prd
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
+    networks:
+      - kafka-net
 
 networks:
-  local:
+  kafka-net:
     driver: bridge
-#
-#  api:
-#    build: ./ApiGatewayService
-#    container_name: ApiGatewayService
-#    ports:
-#      - 8080:8080
-#    depends_on:
-#      - kafka
-#    networks:
-#      - local
-#
-#  auth:
-#    build: ./AuthService
-#    container_name: AuthService
-#    ports:
-#      - 9000:9000
-#    depends_on:
-#      - kafka
-#    networks:
-#      - local
-#
-#  transaction:
-#    build: ./TransactionManagementService
-#    container_name: TransactionManagementService
-#    ports:
-#      - 8082:8082
-#    depends_on:
-#      - kafka
-#    networks:
-#      - local
 
 

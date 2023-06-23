@@ -5,6 +5,10 @@ import com.synpulse.transaction.persentation.dto.ExchangeRateApiResponse;
 import com.synpulse.transaction.persentation.dto.QueryTransactionRequest;
 import com.synpulse.transaction.persentation.dto.QueryTransactionResponse;
 import com.synpulse.transaction.persentation.dto.TransactionRecordDTO;
+import com.synpulse.transaction.utils.DateUtils;
+import io.confluent.ksql.api.client.BatchedQueryResult;
+import io.confluent.ksql.api.client.Client;
+import io.confluent.ksql.api.client.ClientOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -31,7 +36,26 @@ public class TransactionService {
         this.restTemplate = restTemplate;
     }
 
-    public List<TransactionRecord> queryRecord(QueryTransactionRequest transactionRequest) {
+    public List<TransactionRecord> queryRecord(QueryTransactionRequest transactionRequest) throws ParseException {
+        String userId = transactionRequest.getUserId();
+        Date targetDate = DateUtils.convertByFormat(transactionRequest.getTargetDate(), "yyyy-MM-dd");
+
+        String queryKSql = String.format("SELECT * FROM transaction_table " +
+                "WHERE id > %s AND valueDate = %d;", userId, targetDate.getTime());
+
+
+        String serverEndpoint = "localhost";
+
+        // Create ksqlDB client options
+        ClientOptions options = ClientOptions.create()
+                .setHost(serverEndpoint)
+                .setPort(8088);
+
+        // Create ksqlDB client
+        Client client = Client.create(options);
+
+        BatchedQueryResult batchedQueryResult = client.executeQuery(queryKSql);
+
         return new ArrayList<>();
     }
 
@@ -56,7 +80,7 @@ public class TransactionService {
         return rates.get(queryTargetCurrency);
     }
 
-    public QueryTransactionResponse getTransactionTotalCreditAndDebit(QueryTransactionRequest request) throws ExchangeRateApiException {
+    public QueryTransactionResponse getTransactionTotalCreditAndDebit(QueryTransactionRequest request) throws ExchangeRateApiException, ParseException {
         //query to get record
         List<TransactionRecord> transactions = queryRecord(request);
 
@@ -66,7 +90,7 @@ public class TransactionService {
         double totalDebit = 0.0;
 
         for (TransactionRecord transaction : transactions) {
-            String transactionDate = convertDate(transaction.getValueDate(), "yyyy-MM-dd");
+            String transactionDate = DateUtils.convertDate(transaction.getValueDate(), "yyyy-MM-dd");
             double exchangeRate = retrieveExchangeRateApiByCurrency(transactionDate, transaction.getCurrency()); //TODO Need optimal, Shouldn't call api every time
 
             BigDecimal convertedAmount = transaction.getAmount().multiply(BigDecimal.valueOf(exchangeRate));
@@ -95,11 +119,6 @@ public class TransactionService {
                 .totalCredit(totalCredit)
                 .totalDebit(totalDebit)
                 .build();
-    }
-
-    private static String convertDate(Date date, String format) {
-        DateFormat dateFormat = new SimpleDateFormat(format);
-        return dateFormat.format(date);
     }
 
 }

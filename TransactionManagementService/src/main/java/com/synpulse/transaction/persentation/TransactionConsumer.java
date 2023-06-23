@@ -14,6 +14,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+
 @Service
 public class TransactionConsumer {
 
@@ -45,8 +47,9 @@ public class TransactionConsumer {
         } catch (JsonProcessingException e) {
             logger.error(String.format("Error processing JSON: %s, cause: %s", request, e.getMessage()));
         } catch (ExchangeRateApiException e) {
-            e.printStackTrace();
             logger.error(String.format("ExchangeRateApiException, cause: %s", e.getMessage()));
+        } catch (ParseException e) {
+            logger.error(String.format("ParseException, cause: %s", e.getMessage()));
         }
     }
 

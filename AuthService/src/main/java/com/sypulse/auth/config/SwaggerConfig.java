@@ -1,4 +1,4 @@
-package com.sypulse.auth.persentation.config;
+package com.sypulse.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

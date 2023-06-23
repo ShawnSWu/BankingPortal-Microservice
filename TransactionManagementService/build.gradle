@@ -11,6 +11,9 @@ bootJar {
 
 repositories {
     mavenCentral()
+    maven() {
+        url "https://packages.confluent.io/maven/"
+    }
 }
 
 dependencies {
@@ -22,6 +25,9 @@ dependencies {
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUNIT_VERSION
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUNIT_VERSION
+
+// https://mvnrepository.com/artifact/io.confluent.ksql/ksqldb-api-client
+    implementation group: 'io.confluent.ksql', name: 'ksqldb-api-client', version: '7.4.0'
 
 }
 
