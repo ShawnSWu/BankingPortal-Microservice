@@ -54,6 +54,8 @@ public class TransactionConsumer {
             logger.error(String.format("ParseException, cause: %s", e.getMessage()));
         } catch (ExecutionException e) {
             logger.error(String.format("ExecutionException, cause: %s", e.getMessage()));
+        } catch (InterruptedException e) {
+            logger.error(String.format("InterruptedException, cause: %s", e.getMessage()));
         }
     }
 
