@@ -1,7 +1,6 @@
 package com.synpulse.transaction;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.synpulse.transaction.persentation.TransactionConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;

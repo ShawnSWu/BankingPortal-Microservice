@@ -5,11 +5,15 @@ import com.synpulse.transaction.persentation.dto.ExchangeRateApiResponse;
 import com.synpulse.transaction.persentation.dto.QueryTransactionRequest;
 import com.synpulse.transaction.persentation.dto.QueryTransactionResponse;
 import com.synpulse.transaction.utils.DateUtils;
-import io.confluent.ksql.api.client.*;
+import io.confluent.ksql.api.client.BatchedQueryResult;
+import io.confluent.ksql.api.client.Client;
+import io.confluent.ksql.api.client.ClientOptions;
+import io.confluent.ksql.api.client.Row;
+import lombok.Setter;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,10 +23,12 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+@Setter
 @Service
 public class TransactionService {
 
-    private final RestTemplate restTemplate;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Value("${exchangerate.api.url}")
     private String exchangeRateBaseUrl;
@@ -36,11 +42,14 @@ public class TransactionService {
     @Value("${ksqldb.server.port}")
     private String ksqlDbServerPort;
 
-    @Value("${query.response.topic}")
-    private String queryResponseTopic;
-
     @Autowired
     private DateUtils dateUtils;
+
+    @Mock
+    private Client client;
+
+    public TransactionService() {
+    }
 
     public TransactionService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -74,7 +83,7 @@ public class TransactionService {
                 .build();
     }
 
-    public List<TransactionRecord> convertToTransactionRecords(List<Row> rows) {
+    public List<TransactionRecord> convertToTransactionRecords(List<Row> rows) throws ParseException {
         List<TransactionRecord> transactionRecords = new ArrayList<>();
         for (Row row : rows) {
             String id = row.getString("id");
@@ -83,6 +92,7 @@ public class TransactionService {
             String currency = row.getString("currency");
             String accountIban = row.getString("accountIban");
             String date = row.getString("valueDate");
+            Date valueDate = dateUtils.convertByFormat(date, "yyyy-MM-dd");
             String description = row.getString("description");
 
             transactionRecords.add(TransactionRecord.builder()
@@ -91,7 +101,7 @@ public class TransactionService {
                     .amount(amount)
                     .currency(currency)
                     .accountIban(accountIban)
-                    .valueDate(new Date(date))
+                    .valueDate(valueDate)
                     .description(description)
                     .build());
         }
