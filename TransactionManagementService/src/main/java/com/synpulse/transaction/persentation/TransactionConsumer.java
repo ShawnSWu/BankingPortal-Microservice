@@ -11,7 +11,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,8 @@ public class TransactionConsumer {
 
     private static final Logger logger = LogManager.getLogger(TransactionConsumer.class);
 
-    private final TransactionService transactionService;
+    @Autowired
+    private TransactionService transactionService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -34,11 +34,8 @@ public class TransactionConsumer {
     @Value("${query.response.topic}")
     private String queryResponseTopic;
 
-    public TransactionConsumer(TransactionService transactionService) {
-        this.transactionService = transactionService;
-    }
 
-    @KafkaListener(topics = "query_transaction_v1", groupId = "transaction_group", topicPartitions = {TopicPartition})
+    @KafkaListener(topics = "query_transaction_v1", groupId = "transaction_group")
     public void consumeTransaction(String request) {
         try {
             QueryTransactionRequest queryTransactionRequest = objectMapper.readValue(request, QueryTransactionRequest.class);

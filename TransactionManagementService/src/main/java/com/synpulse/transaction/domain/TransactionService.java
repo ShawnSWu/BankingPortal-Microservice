@@ -36,17 +36,17 @@ public class TransactionService {
     @Value("${ksqldb.server.port}")
     private String ksqlDbServerPort;
 
-    @Autowired
-    private KafkaTemplate<String, QueryTransactionResponse> kafkaProducer;
-
     @Value("${query.response.topic}")
     private String queryResponseTopic;
+
+    @Autowired
+    private DateUtils dateUtils;
 
     public TransactionService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    private List<Row> queryTransactionByKsql(String queryKSql) throws ExecutionException, InterruptedException {
+    public List<Row> queryTransactionByKsql(String queryKSql) throws ExecutionException, InterruptedException {
         ClientOptions options = ClientOptions.create()
                 .setHost(ksqlDbServer)
                 .setPort(Integer.parseInt(ksqlDbServerPort));
@@ -57,7 +57,7 @@ public class TransactionService {
         return batchedQueryResult.get();
     }
 
-    private QueryTransactionResponse getTransactionTotalCreditAndDebit(List<TransactionRecord> transactionRecords) {
+    public QueryTransactionResponse getTransactionTotalCreditAndDebit(List<TransactionRecord> transactionRecords) {
         BigDecimal totalCredit = BigDecimal.ZERO;
         BigDecimal totalDebit = BigDecimal.ZERO;
         for (TransactionRecord transactionRecord : transactionRecords) {
@@ -74,7 +74,7 @@ public class TransactionService {
                 .build();
     }
 
-    private List<TransactionRecord> convertToTransactionRecords(List<Row> rows) {
+    public List<TransactionRecord> convertToTransactionRecords(List<Row> rows) {
         List<TransactionRecord> transactionRecords = new ArrayList<>();
         for (Row row : rows) {
             String id = row.getString("id");
@@ -101,10 +101,12 @@ public class TransactionService {
     public QueryTransactionResponse getTransactionRecords(QueryTransactionRequest transactionRequest)
             throws ParseException, ExecutionException, InterruptedException, ExchangeRateApiException {
         String queryUserId = transactionRequest.getUserId();
-        Date targetDate = DateUtils.convertByFormat(transactionRequest.getTargetDate(), "yyyy-MM-dd");
+        Date targetDate = dateUtils.convertByFormat(transactionRequest.getTargetDate(), "yyyy-MM-dd");
+        int pageSize = transactionRequest.getPageSize();
 
+        //TODO find parameter method replace it.
         String queryKSql = String.format("SELECT * FROM transaction_table " +
-                "WHERE userId = %s AND valueDate = %d;", queryUserId, targetDate.getTime());
+                "WHERE userId = %s AND valueDate = %d LIMIT %d;", queryUserId, targetDate.getTime(), pageSize);
 
         List<Row> resultRows = queryTransactionByKsql(queryKSql);
 
