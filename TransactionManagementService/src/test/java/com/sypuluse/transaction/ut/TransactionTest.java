@@ -3,33 +3,29 @@ package com.sypuluse.transaction.ut;
 import com.synpulse.transaction.TransactionManagementApplication;
 import com.synpulse.transaction.domain.TransactionService;
 import com.synpulse.transaction.domain.model.TransactionRecord;
-import com.synpulse.transaction.persentation.dto.ExchangeRateApiResponse;
 import com.synpulse.transaction.persentation.dto.QueryTransactionResponse;
 import com.synpulse.transaction.utils.DateUtils;
 import com.sypuluse.transaction.MockRow;
 import io.confluent.ksql.api.client.BatchedQueryResult;
-import io.confluent.ksql.api.client.Client;
 import io.confluent.ksql.api.client.Row;
-import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 
 @ActiveProfiles("dev")
 @TestPropertySource(locations = "classpath:application-dev.properties")

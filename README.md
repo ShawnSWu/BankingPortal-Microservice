@@ -51,7 +51,7 @@ In the future, encryption for communication can be added to all services.
 Due to time constraints, plaintext transmission is currently used in Brokers for faster development. 
 It should be encryption in the future.
 * Improve CI/CD pipeline and K8S:
-The configuration of CircleCI and Kubernetes (K8S) for continuous integration and continuous deployment (CI/CD) is still incomplete and requires further refinement.
+The configuration of CircleCI and minikube (K8S) for continuous integration and continuous deployment (CI/CD) is still incomplete and requires further refinement.
 
 
 # My experience
