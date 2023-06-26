@@ -20,11 +20,11 @@ services:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper2
     hostname: zookeeper2
+    ports:
+      - '22181:2181'
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
-    ports:
-      - '22181:2181'
     networks:
       - kafka-net
     volumes:
@@ -35,33 +35,36 @@ services:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper3
     hostname: zookeeper3
+    ports:
+      - '32181:2181'
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
-    ports:
-      - '32181:2181'
     networks:
       - kafka-net
     volumes:
-      - ./zookeeper1/data:/var/lib/zookeeper/data
-      - ./zookeeper1/logs:/var/lib/zookeeper/logs
+      - ./zookeeper3/data:/var/lib/zookeeper/data
+      - ./zookeeper3/logs:/var/lib/zookeeper/logs
 
   kafka1:
     image: confluentinc/cp-kafka:latest
     container_name: kafka1
     hostname: kafka1
     ports:
-      - '19092:19092'
+      - "19092:19092"
     environment:
       - KAFKA_BROKER_ID=1
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181/kafka,zookeeper2:2181/kafka,zookeeper3:2181/kafka
+
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:19092
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
 
+      - LISTENERS=PLAINTEXT://kafka1:9092
+
+      - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
       - KAFKA_KRAFT_NUM_REPLICAS=3
       - KAFKA_KRAFT_NUM_PARTITIONS=3
     depends_on:
@@ -79,17 +82,18 @@ services:
     container_name: kafka2
     hostname: kafka2
     ports:
-      - '29092:29092'
+      - "29092:29092"
     environment:
       - KAFKA_BROKER_ID=2
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181/kafka,zookeeper2:2181/kafka,zookeeper3:2181/kafka
+
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka2:9092,PLAINTEXT_HOST://localhost:29092
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - LISTENERS=PLAINTEXT://kafka2:9092
 
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
       - KAFKA_KRAFT_NUM_REPLICAS=3
       - KAFKA_KRAFT_NUM_PARTITIONS=3
     depends_on:
@@ -107,17 +111,19 @@ services:
     container_name: kafka3
     hostname: kafka3
     ports:
-      - '39092:39092'
+      - "39092:39092"
     environment:
       - KAFKA_BROKER_ID=3
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181/kafka,zookeeper2:2181/kafka,zookeeper3:2181/kafka
+
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka3:9092,PLAINTEXT_HOST://localhost:39092
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+
+      - LISTENERS=PLAINTEXT://kafka3:9092
 
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_KRAFT_CLUSTER_ID=transaction-cluster
       - KAFKA_KRAFT_NUM_REPLICAS=3
       - KAFKA_KRAFT_NUM_PARTITIONS=3
     depends_on:
