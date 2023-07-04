@@ -21,6 +21,13 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: SPRING_BOOT_VERSION
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: SPRING_BOOT_VERSION
 
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: SPRING_BOOT_VERSION
+    testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '5.4.0'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.6.9'
+
+
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUNIT_VERSION
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUNIT_VERSION

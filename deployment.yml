@@ -1,0 +1,121 @@
+# NOT COMPLETE YET
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper1
+  template:
+    metadata:
+      labels:
+        app: zookeeper1
+    spec:
+      containers:
+        - name: zookeeper1
+          image: confluentinc/cp-zookeeper:latest
+          ports:
+            - containerPort: 2181
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+            - name: ZOOKEEPER_TICK_TIME
+              value: "2000"
+          volumeMounts:
+            - name: zookeeper1-data
+              mountPath: /var/lib/zookeeper/data
+            - name: zookeeper1-logs
+              mountPath: /var/lib/zookeeper/logs
+      volumes:
+        - name: zookeeper1-data
+          emptyDir: {}
+        - name: zookeeper1-logs
+          emptyDir: {}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper2
+  template:
+    metadata:
+      labels:
+        app: zookeeper2
+    spec:
+      containers:
+        - name: zookeeper2
+          image: confluentinc/cp-zookeeper:latest
+          ports:
+            - containerPort: 2181
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+            - name: ZOOKEEPER_TICK_TIME
+              value: "2000"
+          volumeMounts:
+            - name: zookeeper2-data
+              mountPath: /var/lib/zookeeper/data
+            - name: zookeeper2-logs
+              mountPath: /var/lib/zookeeper/logs
+      volumes:
+        - name: zookeeper2-data
+          emptyDir: {}
+        - name: zookeeper2-logs
+          emptyDir: {}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper3
+  template:
+    metadata:
+      labels:
+        app: zookeeper3
+    spec:
+      containers:
+        - name: zookeeper3
+          image: confluentinc/cp-zookeeper:latest
+          ports:
+            - containerPort: 2181
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+            - name: ZOOKEEPER_TICK_TIME
+              value: "2000"
+          volumeMounts:
+            - name: zookeeper3-data
+              mountPath: /var/lib/zookeeper/data
+            - name: zookeeper3-logs
+              mountPath: /var/lib/zookeeper/logs
+      volumes:
+        - name: zookeeper3-data
+          emptyDir: {}
+        - name: zookeeper3-logs
+          emptyDir: {}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+
