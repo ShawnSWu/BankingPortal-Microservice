@@ -48,4 +48,8 @@ class TransactionControllerTest {
         perform.andExpect(status().is(HttpStatus.OK.value()));
     }
 
+    //TODO test date format
+    //TODO test kafka 400 error(expect exception) and 500 error(unexpect)
+
+
 }
